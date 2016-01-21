@@ -1,0 +1,5 @@
+{
+  "name": "alm/run",
+  "command": "node processor.js",
+  "consumes" : [{"dataType": "alm/run"}]
+}

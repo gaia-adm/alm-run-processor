@@ -1,0 +1,30 @@
+machine:
+  pre:
+    - echo 'DOCKER_OPTS="-s btrfs -e lxc -D --userland-proxy=false"' | sudo tee -a /etc/default/docker
+    - sudo curl -L -o /usr/bin/docker 'https://s3-external-1.amazonaws.com/circle-downloads/docker-1.9.1-circleci-cp-workaround'
+    - sudo chmod 0755 /usr/bin/docker
+  services:
+    - docker
+dependencies:
+  override:
+    - docker build -t gaiaadm/alm-run-processor .
+    - docker tag gaiaadm/alm-run-processor gaiaadm/alm-run-processor:$CIRCLE_BUILD_NUM
+test:
+  override:
+    # prepare RabbitMQ for testing the processor
+    - docker run -d -e RABBITMQ_PASS="admin" --name rabbitmq gaiaadm/rabbitmq; sleep 10
+    # run jshint
+    - docker run --name jshint-runner gaiaadm/alm-run-processor grunt --gruntfile processors/alm-run-processor/Gruntfile.js jshint
+    # run unit tests
+    - docker run -e AMQ_USER="admin" -e AMQ_PASSWORD="admin" -v "/tmp:/upload" --link rabbitmq:amqserver --name unit-test-runner gaiaadm/alm-run-processor:$BUILD_TAG grunt --gruntfile processors/alm-run-processor/Gruntfile.js unit
+    - docker cp unit-test-runner:/src/processors/alm-run-processor/unit-test-results.xml $CIRCLE_TEST_REPORTS/nodejs
+deployment:
+  hub:
+    branch: master
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push gaiaadm/alm-run-processor
+general:
+  branches:
+    only:
+      - master
