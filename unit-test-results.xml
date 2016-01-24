@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="Mocha Tests" time="0.005" tests="1" failures="1">
-  <testsuite name="Root Suite" timestamp="2016-01-21T18:35:13" tests="0" failures="0" time="0">
+<testsuites name="Mocha Tests" time="0.002" tests="3" failures="0">
+  <testsuite name="Root Suite" timestamp="2016-01-24T12:21:22" tests="0" failures="0" time="0">
   </testsuite>
-  <testsuite name="processor-test" timestamp="2016-01-21T18:35:13" tests="0" failures="0" time="0">
+  <testsuite name="processor-test" timestamp="2016-01-24T12:21:22" tests="0" failures="0" time="0">
   </testsuite>
-  <testsuite name="#getFieldNameToValueMap()" timestamp="2016-01-21T18:35:13" tests="1" failures="1" time="0.005">
-    <testcase name="Root Suite processor-test #getFieldNameToValueMap() loads map" time="0.005" classname="loads map">
-      <failure><![CDATA[TypeError: pr.getFieldNameToValueMap(...).get is not a function
-    at C:\Gaia\alm-run-processor\test\processor-test.js:17:64
-    at Parser.<anonymous> (C:\Gaia\alm-run-processor\node_modules\xml2js\lib\xml2js.js:460:18)
-    at Object.onclosetag (C:\Gaia\alm-run-processor\node_modules\xml2js\lib\xml2js.js:421:26)
-    at emit (C:\Gaia\alm-run-processor\node_modules\xml2js\node_modules\sax\lib\sax.js:639:35)
-    at emitNode (C:\Gaia\alm-run-processor\node_modules\xml2js\node_modules\sax\lib\sax.js:644:5)
-    at closeTag (C:\Gaia\alm-run-processor\node_modules\xml2js\node_modules\sax\lib\sax.js:903:7)
-    at Object.write (C:\Gaia\alm-run-processor\node_modules\xml2js\node_modules\sax\lib\sax.js:1436:13)
-    at Parser.exports.Parser.Parser.parseString (C:\Gaia\alm-run-processor\node_modules\xml2js\lib\xml2js.js:479:31)]]></failure>
+  <testsuite name="#getFieldNameToValueMap()" timestamp="2016-01-24T12:21:22" tests="2" failures="0" time="0.001">
+    <testcase name="Root Suite processor-test #getFieldNameToValueMap() create map" time="0" classname="create map">
+    </testcase>
+    <testcase name="Root Suite processor-test #getFieldNameToValueMap() create map with empty values as input" time="0.001" classname="create map with empty values as input">
+    </testcase>
+  </testsuite>
+  <testsuite name="#doParse()" timestamp="2016-01-24T12:21:22" tests="1" failures="0" time="0.001">
+    <testcase name="Root Suite processor-test #doParse() parse json input" time="0.001" classname="parse json input">
     </testcase>
   </testsuite>
 </testsuites>

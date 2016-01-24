@@ -6,102 +6,35 @@ process.env.P_C_PROJECT = 'ProjectNumberOne';
 
 var assert = require('assert');
 var pr = require('./../processor');
-var xml2js = require("xml2js");
-var parser = xml2js.parseString;
+
+var entitiesJson = '{\"entities\":[{\"Fields\":[{\"Name\":\"test-id\",\"values\":[{\"value\":\"135\"}]},{\"Name\":\"test-name\",\"values\":[{\"value\":\"Delete Order\"}]},{\"Name\":\"has-linkage\",\"values\":[{\"value\":\"N\"}]},{\"Name\":\"path\",\"values\":[{\"value\":\"5_1\"}]},{\"Name\":\"cycle-id\",\"values\":[{\"value\":\"5\"}]},{\"Name\":\"vc-version-number\",\"values\":[]},{\"Name\":\"draft\",\"values\":[{\"value\":\"N\"}]},{\"Name\":\"host\",\"values\":[{\"value\":\"KITE\"}]},{\"Name\":\"id\",\"values\":[{\"value\":\"1\"}]},{\"Name\":\"state\",\"values\":[{}]},{\"Name\":\"test-config-id\",\"values\":[{\"value\":\"1135\"}]},{\"Name\":\"ver-stamp\",\"values\":[{\"value\":\"4\"}]},{\"Name\":\"iters-params-values\",\"values\":[{}]},{\"Name\":\"os-build\",\"values\":[{\"value\":\"Build 2600\"}]},{\"Name\":\"os-sp\",\"values\":[{\"value\":\"Service Pack 2\"}]},{\"Name\":\"name\",\"values\":[{\"value\":\"Run_1-27_14-34-57\"}]},{\"Name\":\"testcycl-name\",\"values\":[{\"value\":\"Delete Order [1]\"}]},{\"Name\":\"status\",\"values\":[{\"value\":\"Failed\"}]},{\"Name\":\"os-config\",\"values\":[{}]},{\"Name\":\"vc-locked-by\",\"values\":[{}]},{\"Name\":\"bpt-structure\",\"values\":[{}]},{\"Name\":\"cycle\",\"values\":[{}]},{\"Name\":\"duration\",\"values\":[{\"value\":\"186\"}]},{\"Name\":\"execution-date\",\"values\":[{\"value\":\"2011-01-27\"}]},{\"Name\":\"last-modified\",\"values\":[]},{\"Name\":\"subtype-id\",\"values\":[{\"value\":\"hp.qc.run.BUSINESS-PROCESS\"}]},{\"Name\":\"attachment\",\"values\":[{}]},{\"Name\":\"test-description\",\"values\":[{\"value\":\"<html><body>\\nOrder deletion\\n<\/body><\/html>\"}]},{\"Name\":\"text-sync\",\"values\":[{}]},{\"Name\":\"assign-rcyc\",\"values\":[{}]},{\"Name\":\"owner\",\"values\":[{\"value\":\"cecil_alm\"}]},{\"Name\":\"pinned-baseline\",\"values\":[{}]},{\"Name\":\"comments\",\"values\":[{}]},{\"Name\":\"iters-sum-status\",\"values\":[{}]},{\"Name\":\"bpta-change-detected\",\"values\":[]},{\"Name\":\"test-instance\",\"values\":[{\"value\":\"1\"}]},{\"Name\":\"cycle-name\",\"values\":[{\"value\":\"Flight Application (Fail)\"}]},{\"Name\":\"os-name\",\"values\":[{\"value\":\"Windows XP\"}]},{\"Name\":\"environment\",\"values\":[{}]},{\"Name\":\"vc-status\",\"values\":[{}]},{\"Name\":\"execution-time\",\"values\":[{\"value\":\"14:38:14\"}]},{\"Name\":\"user-01\",\"values\":[{}]},{\"Name\":\"bpta-change-awareness\",\"values\":[{}]},{\"Name\":\"testcycl-id\",\"values\":[{\"value\":\"42\"}]}],\"Type\":\"run\",\"children-count\":0}],\"TotalResults\":168}'
 
 describe('processor-test', function () {
 
     describe('#getFieldNameToValueMap()', function () {
-        it('loads map', function () {
-            parser('<Fields><Field Name="test-id"><Value>145</Value></Field><Field Name="test-name"><Value>Trip Type</Value></Field></Fields>', function(err, result) {
-                assert.equal(pr.getFieldNameToValueMap(result).get('test-name'), 'Trip Type', 'should be Trip Type');
-            });
+        it('create map', function () {
+            var result = JSON.parse('{"Fields":[{"Name":"test-id","values":[{"value":"135"}]},{"Name":"test-name","values":[{"value":"Delete Order"}]}]}');
+            var fieldNameToValueMap = pr.getFieldNameToValueMap(result);
+            assert.equal(fieldNameToValueMap['test-id'].value, '135', 'should be 135');
+            assert.equal(fieldNameToValueMap['test-name'].value, 'Delete Order', 'should be Delete Order');
+        });
+
+        it('create map with empty values as input', function () {
+            var result = JSON.parse('{"Fields":[{"Name":"test-id","values":[{"value":"135"}]},{"Name":"comments","values":[{}]}]}');
+            var fieldNameToValueMap = pr.getFieldNameToValueMap(result);
+            assert.equal(fieldNameToValueMap['test-id'].value, '135', 'should be 135');
+            assert.equal(fieldNameToValueMap['comments'].value, undefined, 'comments should be empty');
         });
     });
 
-    describe('#setIfNotEmpty()', function () {
-        it('not-empty', function () {
-            assert.equal(pr.setIfNotEmpty('ddd'), 'ddd', 'should be ddd');
-        });
-        it('empty-string', function () {
-            assert.equal(pr.setIfNotEmpty(''), null, 'should return null');
-        });
-        it('nothing', function () {
-            assert.equal(pr.setIfNotEmpty(), null, 'should return null');
-        });
-
-    });
-
-    describe('#createFieldFromProperty()', function () {
-        //single property xml example: '<Properties><Property Label="Severity" Name="severity"><NewValue>3-High</NewValue><OldValue>2-Medium</OldValue></Property></Properties>';
-        it('regularProperty', function () {
-            var prop = pr.createFieldFromProperty(createPropertyObject('Severity', 'severity', '3-High', '2-Medium'));
-            assert.strictEqual(prop.constructor, Array, 'prop must be an array');
-            assert.equal(prop.length, 1, 'prop array must have 1 element');
-            assert.equal(prop[0].from, '2-Medium', 'old value becomes "from" and keeps the correct value');
-            assert.equal(prop[0].to, '3-High', 'new value becomes "to" and keeps the correct value');
-            assert.equal(prop[0].label, 'Severity', 'label is correct');
-            assert.equal(prop[0].name, 'severity', 'name is correct');
-        });
-        //single property no old value xml example: '<Properties><Property Label="Severity" Name="severity"><NewValue>3-High</NewValue></Property></Properties>';
-        it('noOldValue', function () {
-            var prop = pr.createFieldFromProperty(createPropertyObject('Severity', 'severity', '3-High', ''));
-            assert.strictEqual(prop.constructor, Array, 'prop must be an array');
-            assert.equal(prop.length, 1, 'prop array must have 1 element');
-            assert.equal(prop[0].from, undefined, 'no old value presented - new issue in ALM');
-            assert.equal(prop[0].to, '3-High', 'new value becomes "to" and keeps the correct value');
-            assert.equal(prop[0].label, 'Severity', 'label is correct');
-            assert.equal(prop[0].name, 'severity', 'name is correct');
-        });
-        //single property empty new value xml example: '<Properties><Property Label="Severity" Name="severity"><NewValue></NewValue><OldValue>3-High</OldValue></Property></Properties>';
-        it('EmptyNewValue', function () {
-            var prop = pr.createFieldFromProperty(createPropertyObject('Severity', 'severity', '', '3-High'));
-            assert.strictEqual(prop.constructor, Array, 'prop must be an array');
-            assert.equal(prop.length, 1, 'prop array must have 1 element');
-            assert.equal(prop[0].from, '3-High', 'old value must be presented');
-            assert.equal(prop[0].to, 'none', 'new value can be empty');
-            assert.equal(prop[0].label, 'Severity', 'label is correct');
-            assert.equal(prop[0].name, 'severity', 'name is correct');
-        });
-        //2 properties xml example: '<Properties><Property Label="Severity" Name="severity"><NewValue>3-High</NewValue><OldValue>2-Medium</OldValue></Property><Property Label="Assigned to" Name="owner"><NewValue>Rick</NewValue><OldValue>Bob</OldValue></Property></Properties>';
-        it('twoProperties', function () {
-            var p1 = createPropertyObject('Severity', 'severity', '3-High', '2-Medium');
-            var p2 = createPropertyObject('Assigned to', 'owner', 'Rick', 'Bob');
-            var p = new Object();
-            p = [];
-            p.push(p1[0]);
-            p.push(p2[0]);
-            var prop = pr.createFieldFromProperty(p);
-            assert.strictEqual(prop.constructor, Array, 'prop must be an array');
-            assert.equal(prop.length, 2, 'prop array must have 1 element');
-            assert.equal(prop[0].from, '2-Medium', 'check oldValue for 1st element');
-            assert.equal(prop[0].name, 'severity', 'check name for 1st element');
-            assert.equal(prop[1].to, 'Rick', 'check newValue for 1st element');
-            assert.equal(prop[1].name, 'owner', 'check name for 1st element');
+    describe('#doParse()', function () {
+        it('parse json input', function () {
+            var result = pr.doParse(entitiesJson);
+            console.log(result);
         });
     });
-
 });
 
-function createPropertyObject(label, name, newValue, oldValue) {
 
-    var prop = new Object();
-    prop.Property = [];
-
-    var pr1 = new Object();
-    pr1.$ = new Object();
-    pr1.$.Label = label;
-    pr1.$.Name = name;
-    pr1.NewValue = [];
-    pr1.NewValue.push(newValue);
-    if (oldValue) {
-        pr1.OldValue = [];
-        pr1.OldValue.push(oldValue);
-    }
-
-    prop.Property.push(pr1);
-
-    return prop.Property;
-}
 
 
