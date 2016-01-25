@@ -56,13 +56,14 @@ var doParse = function (data) {
         tags.type = fieldNameToValueMap["subtype-id"].value;
         testRunEvent.tags = tags;
         var source = {};
-        source.Location = params.C_ALM_LOCATION;
-        source.Domain = params.C_DOMAIN;
-        source.Project = params.C_PROJECT;
+        source.server = params.C_ALM_LOCATION;
+        source.domain = params.C_DOMAIN;
+        source.project = params.C_PROJECT;
         testRunEvent.source = source;
         var results = {};
         results.status = fieldNameToValueMap["status"].value;
-        results.duration = fieldNameToValueMap["duration"].value;
+        results.run_time = fieldNameToValueMap["duration"].value;
+        results.steps = [];
         testRunEvent.result = results;
 
         testrun.push(testRunEvent);
