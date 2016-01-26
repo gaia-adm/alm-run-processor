@@ -10,7 +10,7 @@
   "HostConfig": {
     "Binds": ["/var/lib/rexray/volumes/result-upload-develop:/upload"],
     "Links": [
-      "rabbitmq:rabbitmq",
+      "rabbitmq-1:rabbitmq",
       "mgs:metricsgw"
     ]
   }
