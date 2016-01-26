@@ -46,12 +46,12 @@ var doParse = function (data) {
         testRunEvent.time = new Date(executionDate + ' ' + executionTime).toISOString();
         //set ID section
         var id = {};
-        id.instance = fieldNameToValueMap["id"].value;
+        id.instance = fieldNameToValueMap.id.value;
         id.test_id = fieldNameToValueMap["test-id"].value;
         testRunEvent.id = id;
         //set tags, which are not from metadata
         var tags = {};
-        tags.user = fieldNameToValueMap["owner"].value;
+        tags.user = fieldNameToValueMap.owner.value;
         tags.testset = fieldNameToValueMap["cycle-name"].value;
         tags.type = fieldNameToValueMap["subtype-id"].value;
         testRunEvent.tags = tags;
@@ -61,8 +61,8 @@ var doParse = function (data) {
         source.project = params.C_PROJECT;
         testRunEvent.source = source;
         var results = {};
-        results.status = fieldNameToValueMap["status"].value;
-        results.run_time = fieldNameToValueMap["duration"].value;
+        results.status = fieldNameToValueMap.status.value;
+        results.run_time = fieldNameToValueMap.duration.value;
         results.steps = [];
         testRunEvent.result = results;
 

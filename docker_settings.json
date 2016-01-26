@@ -1,0 +1,17 @@
+{
+  "_comment": "ALM run processor container",
+  "Image": "gaiaadm/alm-run-processor",
+  "Env": [
+    "AMQ_USER=admin",
+    "AMQ_PASSWORD=admin",
+    "AMQ_SERVER=172.17.8.101:5672",
+    "MGS_SERVER=172.17.8.101:9002"
+  ],
+  "HostConfig": {
+    "Binds": ["/var/lib/rexray/volumes/result-upload-develop:/upload"],
+    "Links": [
+      "rabbitmq:rabbitmq",
+      "mgs:metricsgw"
+    ]
+  }
+}
