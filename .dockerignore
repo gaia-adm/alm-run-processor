@@ -1,0 +1,6 @@
+.git
+.gitignore
+alm-run-processor.service
+circle.yml
+node_modules
+README.md
